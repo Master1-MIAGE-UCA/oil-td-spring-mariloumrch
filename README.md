@@ -1,74 +1,48 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/QGf4F8_h)
+
 # Projet "Dice" - Gestion de lancés de dés avec Spring Boot
 
 ## Description
-Le projet "Dice" est une application construite avec Spring Boot permettant de simuler des lancés de dés et de gérer un historique des résultats en base de données. Ce projet met en œuvre les concepts fondamentaux de Spring Boot, notamment l'injection de dépendances, les services RESTful, les entités JPA et les repositories.
+Le projet "Dice" est une application Spring Boot permettant de simuler des lancés de dés et de gérer l'historique des résultats en base de données. Elle illustre les concepts essentiels de Spring Boot, notamment l’injection de dépendances, les services RESTful, les entités JPA et l’utilisation des repositories pour accéder aux données.
 
-
-## Étapes de réalisation
+## Étapes réalisées
 
 ### 1. Création du projet Spring Boot
-- Utilisez [Spring Initializr](https://start.spring.io/) pour créer le projet.
-- Choisissez la dernière version de Spring Boot disponible (LTS).
-- Optez pour **Maven** ou **Gradle** comme outil de gestion de dépendances.
-- Ajoutez les dépendances nécessaires : **Spring Web**, **Spring Data JPA**, **H2 Database** .
+Le projet a été initialisé avec [Spring Initializr](https://start.spring.io/). Nous avons opté pour **Maven** et choisi la dernière version LTS de Spring Boot disponible.  
+Les dépendances **Spring Web**, **Spring Data JPA** et **H2 Database** ont été incluses dès la création du projet.
 
 ### 2. Configuration du projet
-- Configurez l'application pour qu'elle utilise le port **8081**.
-- Donnez un nom (**dice**) au projet dans le fichier de configuration :
-  - Utilisez **`application.properties`** ou **`application.yml`** selon votre préférence.
+Après l’initialisation, l’application a été configurée pour écouter sur le port **8081**. Le nom du projet, **dice**, a également été défini dans le fichier de configuration `application.properties`.
 
 ### 3. Création de la classe `Dice`
-- Implémentez une classe représentant un dé avec les méthodes nécessaires pour effectuer un lancé.
-- Marquez cette classe avec l'annotation `@Component` pour pouvoir l'injecter au besoin.
+Nous avons créé la classe `Dice`, marquée avec l’annotation `@Component`. Elle contient la logique nécessaire pour effectuer un lancé aléatoire. Grâce à l’annotation `@Component`, cette classe est injectée automatiquement partout où nous en avons besoin.
 
-### 4. Création de l'entité `DiceRollLog`
-- Modélisez une entité JPA `DiceRollLog` comprenant les champs suivants :
-  - **`id`** : Identifiant unique.
-  - **`diceCount`** : Nombre de dés lancés.
-  - **`results`** : Liste ou chaîne des valeurs obtenues. Il existe de nombreuses façons de stocker des valeurs simples (simple String), certaines sont plus élégantes (@ElementCollection) que d'autres, vous pouvez choisir la solution qui vous conviendra.
-  - **`timestamp`** : Horodatage du lancé.
-- Utilisez des annotations JPA comme `@Entity`, `@Id`, `@GeneratedValue`, etc.
+### 4. Création de l’entité `DiceRollLog`
+Une entité JPA nommée `DiceRollLog` a été implémentée avec les champs suivants :
+- **`id`** : Identifiant unique (`@Id`, `@GeneratedValue`).
+- **`diceCount`** : Nombre de dés lancés.
+- **`results`** : Chaîne (ou liste) des valeurs obtenues. Nous avons choisi une représentation sous forme de simple chaîne de caractères pour plus de simplicité.
+- **`timestamp`** : Horodatage du lancé.
+
+L’annotation `@Entity` a été utilisée pour spécifier que `DiceRollLog` est une entité persistante gérée par JPA.
 
 ### 5. Création du `Repository`
-- Implémentez une interface héritant de `JpaRepository<DiceRollLog, Long>` pour gérer les interactions avec la base de données.
+Un repository `DiceRollLogRepository` a été créé, héritant de l’interface `JpaRepository<DiceRollLog, Long>`. Il permet d’effectuer les opérations CRUD (Create, Read, Update, Delete) sur la table correspondant à l’entité `DiceRollLog`.
 
 ### 6. Création du contrôleur REST pour lancer les dés
-- Implémentez un contrôleur REST annoté avec `@RestController`.
-- Ajoutez les endpoints suivants :
-  - **`GET /rollDice`** : Lancer un seul dé.
-  - **`GET /rollDices/{X}`** : Lancer X dés (X étant un paramètre dynamique).
+Un contrôleur REST, annoté `@RestController`, a été mis en place avec les endpoints suivants :
+- **`GET api/rollDice`** : Permet de lancer un seul dé.
+- **`GET api/rollDice/{nbLancer}`** : nbLancer est un paramètre passé dans l’URL.
 
 ### 7. Création du `Service`
-- Créez un service marqué avec `@Service` contenant une méthode :
-  - Prend en paramètre le nombre de dés à lancer.
-  - Retourne les résultats des lancés au contrôleur.
-  - Enregistre l’historique des lancés dans la base via le `Repository`.
+Un service annoté `@Service` a été développé pour centraliser la logique métier. Il expose notamment une méthode qui :
+1. Reçoit un nombre de dés à lancer.
+2. Retourne les résultats des lancés au contrôleur.
+3. Enregistre simultanément l’historique des lancés en base de données via le `Repository`.
 
 ### 8. Contrôleur pour afficher les historiques
-- Ajoutez un autre contrôleur REST permettant d'afficher l'historique des lancés :
-  - **`GET /diceLogs`** : Retourne tous les enregistrements de `DiceRollLog` au format JSON.
+Nous avons également implémenté un contrôleur REST dédié à l’affichage de l’historique des lancés :
+- **`GET api/log`** : Retourne l’ensemble des enregistrements de `DiceRollLog` au format JSON.
 
 ### 9. Tests et validation
-- Démarrez l'application et testez les endpoints.
-- Vérifiez les résultats dans la base de données et les réponses JSON.
-
-### 10. (Bonus) Ajout de fonctionnalités avancées
-- **Swagger** :
-  - Ajoutez la dépendance Swagger/OpenAPI.
-  - Configurez Swagger pour documenter vos endpoints.
-  - Accédez à la documentation sur **`http://localhost:8081/swagger-ui.html`**.
-- **Lombok** :
-  - Utilisez Lombok pour simplifier les getters, setters et constructeurs de vos entités.
-
----
-
-## Livrables
-- Le code complet du projet, accessible via un dépôt GitHub.
-- Un fichier `README.md` décrivant les étapes réalisées
-
-## Technologies
-- **Framework principal** : Spring Boot
-- **Base de données** : H2 
-- **Documentation API** : Swagger (bonus)
-- **Simplification de code** : Lombok (bonus)
+Enfin, nous avons démarré l’application pour tester chaque endpoint et vérifier le comportement attendu. Les résultats se sont correctement inscrits dans la base de données H2, et les réponses JSON retournées par les endpoints ont validé le bon fonctionnement de l’application.
